@@ -1,13 +1,13 @@
 pkgbase = nvidia-llb-bede
 	pkgver = 295.59
-	pkgrel = 2
+	pkgrel = 3
 	url = http://www.nvidia.com/
 	arch = i686
 	arch = x86_64
 	license = custom
-	makedepends = linux-bede>=3.4
+	makedepends = linux-bede>=3.4.4-3
 	makedepends = linux-bede<3.5
-	makedepends = linux-bede-headers>=3.4
+	makedepends = linux-bede-headers>=3.4.4-3
 	makedepends = linux-bede-headers<3.5
 	makedepends = nvidia-llb-utils=295.59
 	options = !strip
@@ -15,7 +15,7 @@ pkgbase = nvidia-llb-bede
 pkgname = nvidia-llb-bede
 	pkgdesc = NVIDIA drivers for linux-bede Long Lived Branch
 	install = nvidia.install
-	depends = linux-bede>=3.4
+	depends = linux-bede>=3.4.4-3
 	depends = linux-bede<3.5
 	depends = nvidia-llb-utils=295.59
 	provides = nvidia
