@@ -1,6 +1,6 @@
 pkgbase = nvidia-llb-bede
 	pkgver = 295.59
-	pkgrel = 4
+	pkgrel = 5
 	url = http://www.nvidia.com/
 	arch = i686
 	arch = x86_64
