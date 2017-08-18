@@ -4,58 +4,64 @@
 
 _pkgname=nvidia
 pkgname=$_pkgname-llb-bede
-pkgver=346.72
-_extramodules=4.2-BEDE-external
-pkgrel=19
-pkgdesc="NVIDIA drivers (Long lived branch) for linux-bede"
+pkgver=375.66
+_extramodules=4.12-BEDE-external
+_current_linux_version=4.12.8
+_next_linux_version=4.13
+pkgrel=1
+pkgdesc="NVIDIA drivers for linux-bede"
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
-makedepends=('linux-bede>=4.2.1' 'linux-bede<4.3' 'linux-bede-headers>=4.2' 'linux-bede-headers<4.3' "nvidia-utils-llb=$pkgver" "nvidia-libgl-llb=$pkgver")
-conflicts=('nvidia')
+makedepends=(
+    "linux-bede>=$_current_linux_version"
+    "linux-bede-headers>=$_current_linux_version"
+    "linux-bede<$_next_linux_version"
+    "linux-bede-headers<$_next_linux_version"
+    "nvidia-utils-llb=$pkgver"
+)
 provides=('nvidia')
 license=('custom')
-install=nvidia.install
 options=(!strip)
-
-source=("nvidia-4.2.patch")
-sha256sums=('01fe34a2eeb88057d51849098966e202f1ab94e548afe85ef25f533c8375e3c3')
 
 source_i686=("http://download.nvidia.com/XFree86/Linux-x86/$pkgver/NVIDIA-Linux-x86-$pkgver.run")
 source_x86_64=("http://download.nvidia.com/XFree86/Linux-x86_64/$pkgver/NVIDIA-Linux-x86_64-$pkgver-no-compat32.run")
+sha512sums_i686=('9f890529cba18197dfb340cefdbb058fd7d4edae39c1ef19a398aaba782e66993257a9f3e93b3f43eb51463492644c0cdf2c5a4af612d6401ebc5427783ef94a')
+sha512sums_x86_64=('93d9599ad8605d738697540da7354f91cce6b7c7c8fcacf04e0ee6c697fd3dfd0d682d2d84dbaed5f77aa5b6babcd142aab592ba4483988acd5375345edb6c9c')
 
-sha256sums_i686=('1c3de9895809eb4a61306a46902d12ddfc6c6305ac99d369c56270a962200c2e')
-sha256sums_x86_64=('f0d821e3cedb9365548516d4a2155b80718fd018405c83919a7142b23d27a849')
-
-[[ "$CARCH" = "i686" ]] && _pkg="NVIDIA-Linux-x86-${pkgver}"
-[[ "$CARCH" = "x86_64" ]] && _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
+[[ "$CARCH" == "i686" ]] && _pkg="NVIDIA-Linux-x86-${pkgver}"
+[[ "$CARCH" == "x86_64" ]] && _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
+#_folder=${_pkg//-no-compat32/}
+_folder=${_pkg}
 
 prepare() {
-    [ -d "$_pkg" ] && rm -rf "$_pkg"
+    [ -d "$_folder" ] && rm -rf "$_folder"
     sh $_pkg.run --extract-only
-    cd $_pkg
+    cd $_folder
     # patch if needed
-    patch -Np1 -i ${srcdir}/nvidia-4.2.patch
 }
 
 build() {
     _kernver="$(cat /usr/lib/modules/$_extramodules/version)"
-    cd $_pkg/kernel
+    cd $_folder/kernel
     make SYSSRC=/usr/lib/modules/$_kernver/build module
-
-    if [[ "$CARCH" = "x86_64" ]]; then
-        cd uvm
-        make SYSSRC=/usr/lib/modules/"${_kernver}/build" module
-    fi
 }
 
 package() {
-    depends=('linux-bede>=4.2' 'linux-bede<4.3' "nvidia-utils-llb=${pkgver}" "nvidia-libgl-llb=$pkgver")
+	depends=(
+        "linux-bede>=$_current_linux_version"
+        "linux-bede<$_next_linux_version"
+        "nvidia-utils-llb=$pkgver"
+    )
 
-    install -Dm644 "$srcdir/$_pkg/kernel/nvidia.ko" \
+    install -Dm644 "$srcdir/$_folder/kernel/nvidia.ko" \
         "$pkgdir/usr/lib/modules/$_extramodules/$_pkgname/nvidia.ko"
+    install -Dm644 "$srcdir/$_folder/kernel/nvidia-modeset.ko" \
+        "$pkgdir/usr/lib/modules/$_extramodules/$_pkgname/nvidia-modeset.ko"
+    install -Dm644 "$srcdir/$_folder/kernel/nvidia-drm.ko" \
+        "$pkgdir/usr/lib/modules/$_extramodules/$_pkgname/nvidia-drm.ko"
 
     if [[ "$CARCH" = "x86_64" ]]; then
-        install -D -m644 "${srcdir}/${_pkg}/kernel/uvm/nvidia-uvm.ko" \
+        install -D -m644 "${srcdir}/${_folder}/kernel/nvidia-uvm.ko" \
             "${pkgdir}/usr/lib/modules/${_extramodules}/nvidia-uvm.ko"
     fi
 
@@ -65,7 +71,5 @@ package() {
 
     # gzip all modules
     find "$pkgdir" -name '*.ko' -exec gzip -9 {} \;
-
-    sed -i -e "s/EXTRAMODULES='.*'/EXTRAMODULES='$_extramodules'/" "$startdir/nvidia.install"
 }
 
