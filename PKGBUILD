@@ -5,12 +5,12 @@
 _pkgname=nvidia
 pkgname=$_pkgname-llb-bede
 pkgver=375.66
-_extramodules=4.12-BEDE-external
-_current_linux_version=4.12.10
-_next_linux_version=4.13
-pkgrel=8
+_extramodules=4.13-BEDE-external
+_current_linux_version=4.13
+_next_linux_version=4.14
+pkgrel=9
 pkgdesc="NVIDIA drivers for linux-bede"
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.nvidia.com/"
 makedepends=(
     "linux-bede>=$_current_linux_version"
@@ -25,7 +25,6 @@ options=(!strip)
 
 source_i686=("http://download.nvidia.com/XFree86/Linux-x86/$pkgver/NVIDIA-Linux-x86-$pkgver.run")
 source_x86_64=("http://download.nvidia.com/XFree86/Linux-x86_64/$pkgver/NVIDIA-Linux-x86_64-$pkgver-no-compat32.run")
-sha512sums_i686=('9f890529cba18197dfb340cefdbb058fd7d4edae39c1ef19a398aaba782e66993257a9f3e93b3f43eb51463492644c0cdf2c5a4af612d6401ebc5427783ef94a')
 sha512sums_x86_64=('93d9599ad8605d738697540da7354f91cce6b7c7c8fcacf04e0ee6c697fd3dfd0d682d2d84dbaed5f77aa5b6babcd142aab592ba4483988acd5375345edb6c9c')
 
 [[ "$CARCH" == "i686" ]] && _pkg="NVIDIA-Linux-x86-${pkgver}"
